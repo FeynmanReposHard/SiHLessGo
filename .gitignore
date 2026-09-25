@@ -1,0 +1,46 @@
+# --- Secrets / local environment ---
+.env
+.env.*
+!.env.example
+
+# --- Node / Next.js ---
+node_modules/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# --- Large ML datasets / archives / model artifacts ---
+datasets/
+data/
+*.7z
+*.zip
+*.tar
+*.tar.gz
+*.tif
+*.tiff
+*.npz
+*.npy
+*.pt
+*.pth
+*.ckpt
+
+# --- OS / editors ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- Logs / temp ---
+*.log
+*.tmp
+.tmp/

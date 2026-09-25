@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://slicktrace.local/schemas/investigation.schema.json",
+  "title": "SlickTrace Investigation Data",
+  "type": "object",
+  "required": ["incident", "detection", "drift", "vesselTracks", "sourceAssociations"],
+  "properties": {
+    "incident": { "$ref": "#/$defs/incident" },
+    "detection": { "$ref": "#/$defs/detection" },
+    "drift": { "$ref": "#/$defs/drift" },
+    "vesselTracks": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/vesselTrack" }
+    },
+    "sourceAssociations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/sourceAssociation" }
+    }
+  },
+  "$defs": {
+    "lngLat": {
+      "type": "array",
+      "prefixItems": [{ "type": "number" }, { "type": "number" }],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "incident": {
+      "type": "object",
+      "required": ["id", "name", "region", "center", "acquiredAt", "sensor", "status", "detectionId"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "region": { "type": "string" },
+        "center": { "$ref": "#/$defs/lngLat" },
+        "acquiredAt": { "type": "string", "format": "date-time" },
+        "sensor": { "type": "string" },
+        "mode": { "type": "string" },
+        "processing": { "type": "string" },
+        "status": { "enum": ["investigation-ready", "under-review", "closed"] },
+        "detectionId": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "detection": {
+      "type": "object",
+      "required": ["id", "incidentId", "polygon", "areaKm2", "confidence", "sarThumbnailUrl", "originWindow", "polarization", "sceneId", "processingStatus", "modelVersion"],
+      "properties": {
+        "id": { "type": "string" },
+        "incidentId": { "type": "string" },
+        "polygon": { "type": "object" },
+        "originPolygon": { "type": "object" },
+        "areaKm2": { "type": "number", "minimum": 0 },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "sarThumbnailUrl": { "type": "string" },
+        "probabilityRasterUrl": { "type": "string" },
+        "segmentationRasterUrl": { "type": "string" },
+        "originWindow": {
+          "type": "object",
+          "required": ["start", "end"],
+          "properties": {
+            "start": { "type": "string", "format": "date-time" },
+            "end": { "type": "string", "format": "date-time" }
+          }
+        },
+        "polarization": { "type": "string" },
+        "sceneId": { "type": "string" },
+        "processingStatus": { "enum": ["Processed", "Processing", "Queued"] },
+        "modelVersion": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "drift": {
+      "type": "object",
+      "required": ["incidentId", "points"],
+      "properties": {
+        "incidentId": { "type": "string" },
+        "points": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["timestamp", "position", "hoursFromAcquisition", "kind"],
+            "properties": {
+              "timestamp": { "type": "string", "format": "date-time" },
+              "position": { "$ref": "#/$defs/lngLat" },
+              "hoursFromAcquisition": { "type": "number" },
+              "polygon": { "type": "object" },
+              "kind": { "enum": ["backward", "observed", "forecast"] }
+            }
+          }
+        }
+      }
+    },
+    "vesselTrack": {
+      "type": "object",
+      "required": ["mmsi", "name", "vesselType", "track", "observationWindow"],
+      "properties": {
+        "mmsi": { "type": "string" },
+        "imo": { "type": "string" },
+        "name": { "type": "string" },
+        "vesselType": { "type": "string" },
+        "track": { "type": "array" },
+        "observationWindow": { "type": "object" },
+        "imageUrl": { "type": "string" },
+        "imageSource": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "sourceAssociation": {
+      "type": "object",
+      "required": ["id", "incidentId", "mmsi", "vesselName", "vesselType", "closestApproachKm", "originProximityKm", "scores", "overallCompatibility", "chronology"],
+      "properties": {
+        "id": { "type": "string" },
+        "incidentId": { "type": "string" },
+        "mmsi": { "type": "string" },
+        "vesselName": { "type": "string" },
+        "vesselType": { "type": "string" },
+        "closestApproachKm": { "type": "number", "minimum": 0 },
+        "originProximityKm": { "type": "number", "minimum": 0 },
+        "scores": {
+          "type": "object",
+          "required": ["spatial", "temporal", "trajectory", "aisCoverage"],
+          "properties": {
+            "spatial": { "type": "number", "minimum": 0, "maximum": 1 },
+            "temporal": { "type": "number", "minimum": 0, "maximum": 1 },
+            "trajectory": { "type": "number", "minimum": 0, "maximum": 1 },
+            "aisCoverage": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
+        "overallCompatibility": { "type": "number", "minimum": 0, "maximum": 1 },
+        "chronology": { "type": "array" }
+      },
+      "additionalProperties": true
+    }
+  }
+}
